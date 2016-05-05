@@ -25,7 +25,7 @@ function likCurve(start, end, n, k){
     var largest = 0 //initiate variable to hold largest value
 
     //generate a vector 1000 elements long
-    var p = d3.range(start,end,(end-start)/1000)
+    var p = d3.range(start,end,(end-start)/2000)
 
     var mle = binLik(k/n, n , k)
 
@@ -67,7 +67,7 @@ var yAxis = d3.svg.axis()
 
 var lineStart = d3.svg.line()
     .x(function(d){return x_scale(d.p)})
-    .y(function(d){return 0});
+    .y(function(d){return y_scale(0)});
 
 var line = d3.svg.line()
     .x(function(d){return x_scale(d.p)})
@@ -79,3 +79,28 @@ svg.append("path")
       .attr("d", lineStart)
       .transition().duration(700)
       .attr("d", line);
+
+// Function to update the likelihood curve with new data.
+function updateCurve(n,k){
+    svg.select("path")
+        .datum(likCurve(0, 1, n, k))
+        .transition().duration(700)
+        .attr("d", line);
+}
+
+//calculate the likelihood interval.
+function lik_int(val, lik_vec){
+
+    //traverse up the likelihoods to find left instance of value
+    var left_pos = 0
+    while (lik_vec[left_pos].likelihood < val) {left_pos++;}
+
+
+    //traverse down likelihoods to find right instance
+    var right_pos = lik_vec.length - 1
+    while (lik_vec[right_pos].likelihood < val) { right_pos--;}
+
+    return {"lik": val, "left":lik_vec[left_pos].p, "right":lik_vec[right_pos].p}
+}
+
+//Function to add likelihood intervals to vector.
