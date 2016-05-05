@@ -6,7 +6,8 @@ d3.selection.prototype.moveToFront = function() {
 };
 
 var width = parseInt(d3.select("#viz").style("width").slice(0, -2)),
-    height = $(window).height() - 85;
+    height = $(window).height() - 85,
+    padding = 20;
 
 var svg = d3.select("#viz").append("svg")
     .attr("height", height)
@@ -26,23 +27,55 @@ function likCurve(start, end, n, k){
     //generate a vector 1000 elements long
     var p = d3.range(start,end,(end-start)/1000)
 
+    var mle = binLik(k/n, n , k)
+
     //array to hold the results of likelihood
     var curve = []
 
     //in a loop calculate all value based on likelihood
     //At each timestep check to see if it's the largest and store if it is
     p.forEach(function(val){
-
+        //Calclate the current likelihood value un-normalized
         likelihoodVal = binLik(val, n , k)
-        //push to curve vector
-        curve.push(likelihoodVal)
-
-        //check to see if the current value is bigger than the largest seen yet, if it is make it the new largest
-        largest = likelihoodVal > largest ? likelihoodVal : largest
+        //push to curve vector with normalized value.
+        curve.push({"likelihood":likelihoodVal/mle, "p":val})
     })
-    //divide resultant vector elements by the largest value.
-    var normalized_curve = curve.map(function(x){ return x / largest});
 
-    //return normalized vector.
-    return normalized_curve
+    //return json of normalized vector combined with the p values.
+    return curve
 }
+
+//------------------------------------------------------------------------------
+// Stuff for plotting likelihood curve
+//------------------------------------------------------------------------------
+
+var x_scale = d3.time.scale()
+    .domain([0,1])
+    .range([padding, width-padding]);
+
+var y_scale = d3.scale.linear()
+    .domain([0,1])
+    .range([height-padding, padding]);
+
+var xAxis = d3.svg.axis()
+    .scale(x_scale)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y_scale)
+    .orient("left");
+
+var lineStart = d3.svg.line()
+    .x(function(d){return x_scale(d.p)})
+    .y(function(d){return 0});
+
+var line = d3.svg.line()
+    .x(function(d){return x_scale(d.p)})
+    .y(function(d){return y_scale(d.likelihood)});
+
+svg.append("path")
+      .datum(likCurve(0, 1, 10, 8))
+      .attr("class", "line")
+      .attr("d", lineStart)
+      .transition().duration(700)
+      .attr("d", line);
