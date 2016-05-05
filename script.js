@@ -103,4 +103,19 @@ function lik_int(val, lik_vec){
     return {"lik": val, "left":lik_vec[left_pos].p, "right":lik_vec[right_pos].p}
 }
 
-//Function to add likelihood intervals to vector.
+//Add likelihood intervals to vector.
+var intervals = [lik_int(1/8, likCurve(0, 1, 10, 8))]
+intervals.push(lik_int(1/16, likCurve(0, 1, 10, 8)))
+
+svg.selectAll(".intervals")
+        .data(intervals)
+        .enter()
+        .append("line")
+        .attr("id", ƒ('lik'))
+        .attr("class", "intervals")
+        .attr("x1", function(d){return x_scale(d.left) }  )
+        .attr("y1", function(d){return y_scale(d.lik)  }  )
+        .attr("x2", function(d){return x_scale(d.right)}  )
+        .attr("y2", function(d){return y_scale(d.lik)  }  )
+        .attr("stroke", "red")
+        .attr("stroke-width", 1)
