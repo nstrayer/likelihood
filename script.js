@@ -104,18 +104,43 @@ function lik_int(val, lik_vec){
 }
 
 //Add likelihood intervals to vector.
-var intervals = [lik_int(1/8, likCurve(0, 1, 10, 8))]
-intervals.push(lik_int(1/16, likCurve(0, 1, 10, 8)))
+var intervals = [lik_int(1/8,  likCurve(0, 1, 10, 8))]
+intervals.push(  lik_int(1/16, likCurve(0, 1, 10, 8)))
 
-svg.selectAll(".intervals")
-        .data(intervals)
-        .enter()
-        .append("line")
-        .attr("id", ƒ('lik'))
-        .attr("class", "intervals")
-        .attr("x1", function(d){return x_scale(d.left) }  )
-        .attr("y1", function(d){return y_scale(d.lik)  }  )
-        .attr("x2", function(d){return x_scale(d.right)}  )
-        .attr("y2", function(d){return y_scale(d.lik)  }  )
-        .attr("stroke", "red")
-        .attr("stroke-width", 1)
+var support_ints = svg
+    .append("g")
+    .attr("class", "interval")
+    // .attr("transform", "translate(0,450)")
+
+
+
+function draw_intervals(intervals_data){
+    var speed = 800;
+    var interval_line = support_ints.selectAll("line")
+            .data(intervals_data)
+
+        interval_line.exit()
+            .transition().duration(speed)
+            .attr("x1", width/2)
+            .attr("x2", width/2)
+            .remove()
+
+        interval_line
+            .transition().duration(speed)
+            .attr("x1", function(d){return x_scale(d.left) }  )
+            .attr("x2", function(d){return x_scale(d.right)}  )
+
+        interval_line.enter()
+            .append("line")
+            .attr("id", ƒ('lik'))
+            .attr("class", "intervals")
+            .attr("x1", function(d){return x_scale((d.right + d.left)/2) }  )
+            .attr("x2", function(d){return x_scale((d.right + d.left)/2) }  )
+            .attr("y1", function(d){return y_scale(d.lik)  }  )
+            .attr("y2", function(d){return y_scale(d.lik)  }  )
+            .transition().duration(speed)
+            .attr("x1", function(d){return x_scale(d.left) }  )
+            .attr("x2", function(d){return x_scale(d.right)}  )
+            .attr("stroke", "red")
+            .attr("stroke-width", 1)
+}
