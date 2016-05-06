@@ -7,16 +7,14 @@ d3.selection.prototype.moveToFront = function() {
 
 var width = parseInt(d3.select("#viz").style("width").slice(0, -2)),
     height = $(window).height() - 85,
-    padding = 20;
+    padding = 30;
 
 var svg = d3.select("#viz").append("svg")
     .attr("height", height)
     .attr("width", width)
 
 //Binomial likelihood function.
-function binLik(p, n , k){
-    return Math.pow(p,k) * Math.pow((1-p), (n - k))
-}
+function binLik(p, n , k){ return Math.pow(p,k) * Math.pow((1-p), (n - k)) }
 
 // Function that takes a range of p (0, 1) and calcuates the maximum val (MLE)
 // then divides the rest of the results by that value to get a normalized likelihood
@@ -95,7 +93,6 @@ function lik_int(val, lik_vec){
     var left_pos = 0
     while (lik_vec[left_pos].likelihood < val) {left_pos++;}
 
-
     //traverse down likelihoods to find right instance
     var right_pos = lik_vec.length - 1
     while (lik_vec[right_pos].likelihood < val) { right_pos--;}
@@ -109,38 +106,74 @@ intervals.push(  lik_int(1/16, likCurve(0, 1, 10, 8)))
 
 var support_ints = svg
     .append("g")
-    .attr("class", "interval")
-    // .attr("transform", "translate(0,450)")
+    .attr("class", "intervals")
 
-
-
+//Function to add, remove, or move intervals.
 function draw_intervals(intervals_data){
     var speed = 800;
-    var interval_line = support_ints.selectAll("line")
+    var interval_line = support_ints.selectAll(".interval")
             .data(intervals_data)
 
-        interval_line.exit()
-            .transition().duration(speed)
-            .attr("x1", width/2)
-            .attr("x2", width/2)
-            .remove()
+    interval_line.exit()
+        .transition().duration(speed)
+        .attr("x1", width/2)
+        .attr("x2", width/2)
+        .remove()
 
-        interval_line
-            .transition().duration(speed)
-            .attr("x1", function(d){return x_scale(d.left) }  )
-            .attr("x2", function(d){return x_scale(d.right)}  )
+    interval_line
+        .transition().duration(speed)
+        .attr("x1", function(d){return x_scale(d.left) }  )
+        .attr("x2", function(d){return x_scale(d.right)}  )
 
-        interval_line.enter()
-            .append("line")
-            .attr("id", ƒ('lik'))
-            .attr("class", "intervals")
-            .attr("x1", function(d){return x_scale((d.right + d.left)/2) }  )
-            .attr("x2", function(d){return x_scale((d.right + d.left)/2) }  )
-            .attr("y1", function(d){return y_scale(d.lik)  }  )
-            .attr("y2", function(d){return y_scale(d.lik)  }  )
-            .transition().duration(speed)
-            .attr("x1", function(d){return x_scale(d.left) }  )
-            .attr("x2", function(d){return x_scale(d.right)}  )
-            .attr("stroke", "red")
-            .attr("stroke-width", 1)
+    interval_line.enter()
+        .append("line")
+        .attr("id", ƒ('lik'))
+        .attr("class", "intervals")
+        .attr("x1", function(d){return x_scale((d.right + d.left)/2) }  )
+        .attr("x2", function(d){return x_scale((d.right + d.left)/2) }  )
+        .attr("y1", function(d){return y_scale(d.lik)  }  )
+        .attr("y2", function(d){return y_scale(d.lik)  }  )
+        .transition().duration(speed)
+        .attr("x1", function(d){return x_scale(d.left) }  )
+        .attr("x2", function(d){return x_scale(d.right)}  )
+        .attr("stroke", "red")
+        .attr("stroke-width", 1)
+
+    var interval_text = support_ints.selectAll(".intervalText")
+            .data(intervals_data)
+            .enter()
+            .append("g")
+
+    // interval_text.exit()
+    //     .transition().duration(speed)
+    //     .attr("x", 0)
+    //     .remove()
+    //
+    // interval_text
+    //     .transition().duration(speed)
+    //     .attr("x", function(d){return x_scale(d.left) }  )
+
+    var leftText = interval_text
+        .append("text")
+        .attr("class", "intervalText")
+        .attr("text-anchor", "right")
+        .attr("font-size", 12)
+        .attr("x", function(d){return x_scale(d.left) - 42 }  )
+        .attr("y", function(d){return y_scale(d.lik) - 2 }  )
+        .text( function(d){return Math.round(d.left*1000)/1000  }  )
+        .attr("font-family", "Optima")
+        .attr("font-size", 18);
+
+    var rightText = interval_text
+        .append("text")
+        .attr("class", "intervalText")
+        .attr("text-anchor", "left")
+        .attr("font-size", 12)
+        .attr("x", function(d){return x_scale(d.right) }  )
+        .attr("y", function(d){return y_scale(d.lik) - 2 }  )
+        .text( function(d){return Math.round(d.right*1000)/1000  }  )
+        .attr("font-family", "Optima")
+        .attr("font-size", 18);
 }
+
+draw_intervals(intervals)
