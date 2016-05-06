@@ -116,7 +116,10 @@ function lik_int(val, lik_vec){
     var right_pos = lik_vec.length - 1
     while (lik_vec[right_pos].likelihood < val) { right_pos--;}
 
-    return {"lik": val, "left":lik_vec[left_pos].p, "right":lik_vec[right_pos].p}
+    var left  = Math.max(lik_vec[left_pos].p, 0) //dont let the intervals go out of bounds.
+    var right = Math.min(lik_vec[right_pos].p, 1)
+
+    return {"lik": val, "left":left, "right":right}
 }
 
 //Add likelihood intervals to vector.
@@ -135,7 +138,7 @@ function draw_intervals(intervals_data){
     var speed = 800;
 
     var support_ints = svg.selectAll(".supportIntervals")
-        .data(intervals_data)
+        .data(intervals_data, function(d){return d.lik})
 
     support_ints
         .each(function(d){
@@ -145,29 +148,30 @@ function draw_intervals(intervals_data){
                 .attr("x2", x_scale(d.right))
 
             d3.select(this).select(".leftDropLine")
-                .attr("y2", 0 )
+                .transition().duration(speed)
                 .attr("x1", x_scale(d.left) )
                 .attr("x2", x_scale(d.left) )
-                .transition().delay(speed).duration(speed)
-                .attr("y2", height - padding - y_scale(d.lik) )
 
             d3.select(this).select(".rightDropLine")
-                .attr("y2", 0 )
+                .transition().duration(speed)
                 .attr("x1", x_scale(d.right) )
                 .attr("x2", x_scale(d.right) )
-                .transition().delay(speed).duration(speed)
-                .attr("y2", height - padding - y_scale(d.lik) )
 
             d3.select(this).select(".leftText")
                 .transition().duration(speed)
                 .text( Math.round(d.left*1000)/1000 )
-                .attr("x", x_scale(d.left) - 42 )
+                .attr("x", x_scale(d.left) - 2)
 
             d3.select(this).select(".rightText")
                 .transition().duration(speed)
                 .text( Math.round(d.right*1000)/1000 )
-                .attr("x", x_scale(d.right) )
+                .attr("x", x_scale(d.right) + 2)
         })
+
+    support_ints.exit()
+        .transition().duration(speed)
+        .attr("transform", "scale(0.1)") //shrink the intervals away.
+        .remove()
 
     support_ints.enter()
         .append("g")
@@ -221,34 +225,26 @@ function draw_intervals(intervals_data){
                 .append("text")
                 .attr("class", "leftText")
                 .text( Math.round(d.left*1000)/1000 )
-                .attr("text-anchor", "right")
-                .attr("font-size", 12)
+                .attr("text-anchor", "end")
+                .attr("font-size", 14)
                 .attr("font-family", "Optima")
-                .attr("font-size", 18)
                 .attr("x",  x_scale((d.right + d.left)/2) )
                 .attr("y", -2 )
                 .transition().duration(speed)
-                .attr("x", x_scale(d.left) - 42 )
+                .attr("x", x_scale(d.left) -2)
 
             d3.select(this)
                 .append("text")
                 .attr("class", "rightText")
                 .text( Math.round(d.right*1000)/1000 )
-                .attr("text-anchor", "left")
-                .attr("font-size", 12)
+                .attr("text-anchor", "start")
+                .attr("font-size", 14)
                 .attr("font-family", "Optima")
-                .attr("font-size", 18)
                 .attr("x",  x_scale((d.right + d.left)/2) )
                 .attr("y", -2 )
                 .transition().duration(speed)
-                .attr("x", x_scale(d.right) )
+                .attr("x", x_scale(d.right) + 2)
         })
-
-    support_ints.exit()
-        .transition().duration(speed)
-        .attr("transform", "scale(0.1)") //shrink the intervals away.
-        .remove()
-
 }
 
 draw_intervals(intervals)
@@ -256,17 +252,14 @@ draw_intervals(intervals)
 //function to update the whole plot with new data
 // Function to update the likelihood curve with new data.
 function updateCurve(n,k){
-    var curveData = likCurve(0, 1, n, k)
+    curveData = likCurve(0, 1, n, k)
     svg.select(".likelihoodCurve")
         .datum(curveData)
         .transition().duration(700)
         .attr("d", line);
 
-    //update the intervals
-    intervals = generateIntervals(currentIntervals, curveData)
-    draw_intervals(intervals)
+    newIntervals()
 }
-
 
 //Allow the user to input a custom n and x value and then update the trials bar.
 function customNK(){
@@ -278,4 +271,17 @@ function customNK(){
     if(k > n){document.getElementById("customX").value = n}
 
     updateCurve(n,k) //update the likelihood and the intervals.
+}
+
+function newIntervals(){
+    var selected = []
+    $("input:checkbox[name=intervals]:checked").each(function(){
+        selected.push(eval($(this).val()));
+    });
+    //grab user input from the custom interval box
+    var customVal = eval(document.getElementById("customInt").value)
+    //check if they put anything in and if they did push it to inverval array.
+    if(customVal != null){ selected.push(customVal)}
+
+    draw_intervals(generateIntervals(selected, curveData))
 }

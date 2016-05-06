@@ -35,10 +35,10 @@
         <h3>Support Intervals</h3>
         <p>An 1/a interval is an interval that all contains all values of the given parameter that have at least
             a 1/a chance of being the true given the observed data. </p>
-        <p> Checkboxes go here </p>
         <form action="demo_form.asp" method="get">
-          <input type="checkbox" name="1/8" value="1/8"> 1/8 <br>
-          <input type="checkbox" name="1/16" value="1/16" checked="checked"> 1/16<br>
+          <input type="checkbox" name="intervals" id = "1_8_int"  value="1/8"  checked="checked"> 1/8 <br>
+          <input type="checkbox" name="intervals" id = "1_16_int" value="1/16" checked="checked"> 1/16<br>
+          <input type="text"     name="intervals" id = "customInt" value="1/6.8" size="8">
           <input type="button" onclick="newIntervals()" value="Submit">
         </form>
 
