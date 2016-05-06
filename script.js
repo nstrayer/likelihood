@@ -47,7 +47,7 @@ function likCurve(start, end, n, k){
 // Stuff for plotting likelihood curve
 //------------------------------------------------------------------------------
 
-var x_scale = d3.time.scale()
+var x_scale = d3.scale.linear()
     .domain([0,1])
     .range([padding, width-padding]);
 
@@ -62,6 +62,31 @@ var xAxis = d3.svg.axis()
 var yAxis = d3.svg.axis()
     .scale(y_scale)
     .orient("left");
+
+//draw the axes
+svg.append("g")
+     .attr("class", "x axis")
+     .attr("transform", "translate(0," + (height - padding) + ")")
+     .call(xAxis)
+     .append("text")
+         .attr("transform", "translate("+ width/2.1 + " 12)")
+        //  .attr("y", 6)
+         .attr("dy", ".9em")
+         .style("text-anchor", "end")
+         .style("font-size", 15)
+         .text("Binomial p");
+
+svg.append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(" + padding + ",0)")
+    .call(yAxis)
+    .append("text")
+        .attr("transform", "translate(" + padding*1.5 + ",0)")
+        .attr("y", 6)
+        .attr("dy", ".9em")
+        .style("text-anchor", "end")
+        .style("font-size", 15)
+        .text("Likelihood");
 
 var lineStart = d3.svg.line()
     .x(function(d){return x_scale(d.p)})
@@ -147,17 +172,17 @@ function draw_intervals(intervals_data){
 
 
             d3.select(this)
-            .append("text")
-            .attr("class", "rightText")
-            .text( Math.round(d.right*1000)/1000 )
-            .attr("text-anchor", "left")
-            .attr("font-size", 12)
-            .attr("font-family", "Optima")
-            .attr("font-size", 18)
-            .attr("x",  x_scale((d.right + d.left)/2) )
-            .attr("y", -2 )
-            .transition().duration(speed)
-            .attr("x", x_scale(d.right) )
+                .append("text")
+                .attr("class", "rightText")
+                .text( Math.round(d.right*1000)/1000 )
+                .attr("text-anchor", "left")
+                .attr("font-size", 12)
+                .attr("font-family", "Optima")
+                .attr("font-size", 18)
+                .attr("x",  x_scale((d.right + d.left)/2) )
+                .attr("y", -2 )
+                .transition().duration(speed)
+                .attr("x", x_scale(d.right) )
         })
 
     support_ints.exit()

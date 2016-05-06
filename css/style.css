@@ -50,7 +50,7 @@ strong.choosen{
 }
 
 .x.axis path {
-  display: none;
+  /*display: none;*/
 }
 
 .line {
