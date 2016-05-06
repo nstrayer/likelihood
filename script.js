@@ -13,6 +13,7 @@ var svg = d3.select("#viz").append("svg")
     .attr("height", height)
     .attr("width", width)
 
+var currentIntervals = [1/8, 1/16]
 //Binomial likelihood function.
 function binLik(p, n , k){ return Math.pow(p,k) * Math.pow((1-p), (n - k)) }
 
@@ -70,7 +71,6 @@ svg.append("g")
      .call(xAxis)
      .append("text")
          .attr("transform", "translate("+ width/2.1 + " 12)")
-        //  .attr("y", 6)
          .attr("dy", ".9em")
          .style("text-anchor", "end")
          .style("font-size", 15)
@@ -96,20 +96,15 @@ var line = d3.svg.line()
     .x(function(d){return x_scale(d.p)})
     .y(function(d){return y_scale(d.likelihood)});
 
+var curveData = likCurve(0, 1, 10, 8)
+
 svg.append("path")
-      .datum(likCurve(0, 1, 10, 8))
-      .attr("class", "line")
+      .datum(curveData)
+      .attr("class", "line likelihoodCurve")
       .attr("d", lineStart)
       .transition().duration(700)
       .attr("d", line);
 
-// Function to update the likelihood curve with new data.
-function updateCurve(n,k){
-    svg.select("path")
-        .datum(likCurve(0, 1, n, k))
-        .transition().duration(700)
-        .attr("d", line);
-}
 
 //calculate the likelihood interval.
 function lik_int(val, lik_vec){
@@ -126,8 +121,14 @@ function lik_int(val, lik_vec){
 }
 
 //Add likelihood intervals to vector.
-var intervals = [lik_int(1/8,  likCurve(0, 1, 10, 8))]
-intervals.push(  lik_int(1/16, likCurve(0, 1, 10, 8)))
+function generateIntervals(currentIntervals, curveData){
+    var ints = []
+    currentIntervals.forEach(function(int){ ints.push(lik_int(int,  curveData) )})
+    return ints
+}
+
+//generate initial intervals for plotting
+var intervals = generateIntervals(currentIntervals, curveData)
 
 
 //Function to add, remove, or move intervals.
@@ -136,6 +137,25 @@ function draw_intervals(intervals_data){
 
     var support_ints = svg.selectAll(".supportIntervals")
         .data(intervals_data)
+
+
+    support_ints
+        .each(function(d){
+            d3.select(this).select(".intervalLine") //start with the lines.
+                .transition().duration(speed)
+                .attr("x1", x_scale(d.left) )
+                .attr("x2", x_scale(d.right))
+
+            d3.select(this).select(".leftText")
+                .transition().duration(speed)
+                .text( Math.round(d.left*1000)/1000 )
+                .attr("x", x_scale(d.left) - 42 )
+
+            d3.select(this).select(".rightText")
+                .transition().duration(speed)
+                .text( Math.round(d.right*1000)/1000 )
+                .attr("x", x_scale(d.right) )
+        })
 
     support_ints.enter()
         .append("g")
@@ -170,7 +190,6 @@ function draw_intervals(intervals_data){
                 .transition().duration(speed)
                 .attr("x", x_scale(d.left) - 42 )
 
-
             d3.select(this)
                 .append("text")
                 .attr("class", "rightText")
@@ -188,6 +207,22 @@ function draw_intervals(intervals_data){
     support_ints.exit()
         .transition().duration(speed)
         .attr("transform", "scale(0.1)") //shrink the intervals away.
+        .remove()
+
 }
 
 draw_intervals(intervals)
+
+//function to update the whole plot with new data
+// Function to update the likelihood curve with new data.
+function updateCurve(n,k){
+    var curveData = likCurve(0, 1, n, k)
+    svg.select(".likelihoodCurve")
+        .datum(curveData)
+        .transition().duration(700)
+        .attr("d", line);
+
+    //update the intervals
+    intervals = generateIntervals(currentIntervals, curveData)
+    draw_intervals(intervals)
+}
