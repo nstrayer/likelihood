@@ -7,7 +7,7 @@ d3.selection.prototype.moveToFront = function() {
 
 var width = parseInt(d3.select("#viz").style("width").slice(0, -2)),
     height = $(window).height() - 85,
-    padding = 30;
+    padding = 35;
 
 var svg = d3.select("#viz").append("svg")
     .attr("height", height)
@@ -70,7 +70,7 @@ svg.append("g")
      .attr("transform", "translate(0," + (height - padding) + ")")
      .call(xAxis)
      .append("text")
-         .attr("transform", "translate("+ width/2.1 + " 12)")
+         .attr("transform", "translate("+ width/2 + " 15)")
          .attr("dy", ".9em")
          .style("text-anchor", "end")
          .style("font-size", 15)
@@ -108,7 +108,6 @@ svg.append("path")
 
 //calculate the likelihood interval.
 function lik_int(val, lik_vec){
-
     //traverse up the likelihoods to find left instance of value
     var left_pos = 0
     while (lik_vec[left_pos].likelihood < val) {left_pos++;}
@@ -144,6 +143,20 @@ function draw_intervals(intervals_data){
                 .transition().duration(speed)
                 .attr("x1", x_scale(d.left) )
                 .attr("x2", x_scale(d.right))
+
+            d3.select(this).select(".leftDropLine")
+                .attr("y2", 0 )
+                .attr("x1", x_scale(d.left) )
+                .attr("x2", x_scale(d.left) )
+                .transition().delay(speed).duration(speed)
+                .attr("y2", height - padding - y_scale(d.lik) )
+
+            d3.select(this).select(".rightDropLine")
+                .attr("y2", 0 )
+                .attr("x1", x_scale(d.right) )
+                .attr("x2", x_scale(d.right) )
+                .transition().delay(speed).duration(speed)
+                .attr("y2", height - padding - y_scale(d.lik) )
 
             d3.select(this).select(".leftText")
                 .transition().duration(speed)
@@ -252,4 +265,17 @@ function updateCurve(n,k){
     //update the intervals
     intervals = generateIntervals(currentIntervals, curveData)
     draw_intervals(intervals)
+}
+
+
+//Allow the user to input a custom n and x value and then update the trials bar.
+function customNK(){
+    //grab values from the user form
+    var n = +document.getElementById("customN").value;
+    var k = +document.getElementById("customX").value;
+
+    //if the user accidentally put more successes than trials fix it.
+    if(k > n){document.getElementById("customX").value = n}
+
+    updateCurve(n,k) //update the likelihood and the intervals.
 }

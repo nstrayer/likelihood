@@ -9,9 +9,54 @@
 <script src="d3.min.js"></script>
 <script src="js/d3-jetpack.js"></script>
 <script src="js/lodash.core.js"></script>
-<div id = "header"><h1></h1></div>
-<div id = "viz" class = "col-md-12 col-sm-12"></div>
+<link href  = "js/nouislider.css" rel="stylesheet">
+<link href  = "js/nouislider.pips.css" rel="stylesheet">
+<script src = "js/nouislider.min.js"></script>
+<body>
+    <div id = "header"><h1></h1></div>
+    <div id = "menu" class = "col-md-3 col-md-offset-1 col-sm-12">
 
+    <div class = "menuSection">
+        <h1>The Likelihood Function</h1>
+
+        <hr>
+
+        <h3>Your Data</h3>
+        <p> Enter your number of trials (n) and number of successes (k). </p>
+        <form>
+          <span class = "results"> n:</span>
+          <input type="text" name="trials" value="10" id = "customN" size="8">
+          <span class = "results"> k:</span>
+          <input type="text" name="successes" value="8" id = "customX" size="8">
+        <input type="button" onclick="customNK()" value="Submit">
+        </form>
+        <hr>
+
+        <h3>Support Intervals</h3>
+        <p>An 1/a interval is an interval that all contains all values of the given parameter that have at least
+            a 1/a chance of being the true given the observed data. </p>
+        <p> Checkboxes go here </p>
+        <form action="demo_form.asp" method="get">
+          <input type="checkbox" name="1/8" value="1/8"> 1/8 <br>
+          <input type="checkbox" name="1/16" value="1/16" checked="checked"> 1/16<br>
+          <input type="button" onclick="newIntervals()" value="Submit">
+        </form>
+
+        <hr>
+
+        <h3>Likelihood Ratio</h3>
+        <p> A likelihood ratio is the likelihood that your hypothesis 1 is true
+            over your hypothesis 2 according to the observed data.</p>
+        <div id = "probOfSuccess" class = "valueSlider col-md-12"></div>
+        <p></p>
+    </div>
+
+    </div>
+
+    </div>
+
+    <div id = "viz" class = "col-md-7 col-sm-12"></div>
+</body>
 
 <script src = "script.js"></script>
 <script src = "js/bootstrap.min.js"></script>
