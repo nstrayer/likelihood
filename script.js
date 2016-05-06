@@ -138,7 +138,6 @@ function draw_intervals(intervals_data){
     var support_ints = svg.selectAll(".supportIntervals")
         .data(intervals_data)
 
-
     support_ints
         .each(function(d){
             d3.select(this).select(".intervalLine") //start with the lines.
@@ -175,6 +174,34 @@ function draw_intervals(intervals_data){
                 .attr("x1", x_scale(d.left) )
                 .attr("x2", x_scale(d.right))
                 .attr("stroke", "red")
+                .attr("stroke-width", 1)
+
+            d3.select(this) //Left dropdown line
+                .append("line")
+                .attr("class", "leftDropLine")
+                .attr("x1", x_scale(d.left) )
+                .attr("x2", x_scale(d.left) )
+                .attr("y1", 0 )
+                .attr("y2", 0 )
+                .transition().delay(speed).duration(speed)
+                .attr("y1", 0 )
+                .attr("y2", height - padding - y_scale(d.lik) )
+                .attr("stroke", "grey")
+                .attr("opacity", 0.3)
+                .attr("stroke-width", 1)
+
+            d3.select(this) //Left dropdown line
+                .append("line")
+                .attr("class", "rightDropLine")
+                .attr("x1", x_scale(d.right) )
+                .attr("x2", x_scale(d.right) )
+                .attr("y1", 0 )
+                .attr("y2", 0 )
+                .transition().delay(speed).duration(speed)
+                .attr("y1", 0 )
+                .attr("y2", height - padding - y_scale(d.lik) )
+                .attr("stroke", "grey")
+                .attr("opacity", 0.3)
                 .attr("stroke-width", 1)
 
             d3.select(this) //Now the text
