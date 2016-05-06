@@ -104,76 +104,65 @@ function lik_int(val, lik_vec){
 var intervals = [lik_int(1/8,  likCurve(0, 1, 10, 8))]
 intervals.push(  lik_int(1/16, likCurve(0, 1, 10, 8)))
 
-var support_ints = svg
-    .append("g")
-    .attr("class", "intervals")
 
 //Function to add, remove, or move intervals.
 function draw_intervals(intervals_data){
     var speed = 800;
-    var interval_line = support_ints.selectAll(".interval")
-            .data(intervals_data)
 
-    interval_line.exit()
+    var support_ints = svg.selectAll(".supportIntervals")
+        .data(intervals_data)
+
+    support_ints.enter()
+        .append("g")
+        .attr("class", "supportIntervals")
+        .attr("transform", function(d){ //move the g up to the right position
+            return "translate( 0 ," + y_scale(d.lik) +")";
+        })
+        .each(function(d){
+            d3.select(this) //start with the lines.
+                .append("line")
+                .attr("class", "intervalLine")
+                .attr("x1", x_scale((d.right + d.left)/2) )
+                .attr("x2", x_scale((d.right + d.left)/2) )
+                .attr("y1", 0 ) //we already took care of the vertical positioning
+                .attr("y2", 0 )
+                .transition().duration(speed)
+                .attr("x1", x_scale(d.left) )
+                .attr("x2", x_scale(d.right))
+                .attr("stroke", "red")
+                .attr("stroke-width", 1)
+
+            d3.select(this) //Now the text
+                .append("text")
+                .attr("class", "leftText")
+                .text( Math.round(d.left*1000)/1000 )
+                .attr("text-anchor", "right")
+                .attr("font-size", 12)
+                .attr("font-family", "Optima")
+                .attr("font-size", 18)
+                .attr("x",  x_scale((d.right + d.left)/2) )
+                .attr("y", -2 )
+                .transition().duration(speed)
+                .attr("x", x_scale(d.left) - 42 )
+
+
+            d3.select(this)
+            .append("text")
+            .attr("class", "rightText")
+            .text( Math.round(d.right*1000)/1000 )
+            .attr("text-anchor", "left")
+            .attr("font-size", 12)
+            .attr("font-family", "Optima")
+            .attr("font-size", 18)
+            .attr("x",  x_scale((d.right + d.left)/2) )
+            .attr("y", -2 )
+            .transition().duration(speed)
+            .attr("x", x_scale(d.right) )
+        })
+
+    support_ints.exit()
         .transition().duration(speed)
-        .attr("x1", width/2)
-        .attr("x2", width/2)
-        .remove()
-
-    interval_line
-        .transition().duration(speed)
-        .attr("x1", function(d){return x_scale(d.left) }  )
-        .attr("x2", function(d){return x_scale(d.right)}  )
-
-    interval_line.enter()
-        .append("line")
-        .attr("id", ƒ('lik'))
-        .attr("class", "intervals")
-        .attr("x1", function(d){return x_scale((d.right + d.left)/2) }  )
-        .attr("x2", function(d){return x_scale((d.right + d.left)/2) }  )
-        .attr("y1", function(d){return y_scale(d.lik)  }  )
-        .attr("y2", function(d){return y_scale(d.lik)  }  )
-        .transition().duration(speed)
-        .attr("x1", function(d){return x_scale(d.left) }  )
-        .attr("x2", function(d){return x_scale(d.right)}  )
-        .attr("stroke", "red")
-        .attr("stroke-width", 1)
-
-    var interval_text = support_ints.selectAll(".intervalText")
-            .data(intervals_data)
-            .enter()
-            .append("g")
-
-    // interval_text.exit()
-    //     .transition().duration(speed)
-    //     .attr("x", 0)
-    //     .remove()
-    //
-    // interval_text
-    //     .transition().duration(speed)
-    //     .attr("x", function(d){return x_scale(d.left) }  )
-
-    var leftText = interval_text
-        .append("text")
-        .attr("class", "intervalText")
-        .attr("text-anchor", "right")
-        .attr("font-size", 12)
-        .attr("x", function(d){return x_scale(d.left) - 42 }  )
-        .attr("y", function(d){return y_scale(d.lik) - 2 }  )
-        .text( function(d){return Math.round(d.left*1000)/1000  }  )
-        .attr("font-family", "Optima")
-        .attr("font-size", 18);
-
-    var rightText = interval_text
-        .append("text")
-        .attr("class", "intervalText")
-        .attr("text-anchor", "left")
-        .attr("font-size", 12)
-        .attr("x", function(d){return x_scale(d.right) }  )
-        .attr("y", function(d){return y_scale(d.lik) - 2 }  )
-        .text( function(d){return Math.round(d.right*1000)/1000  }  )
-        .attr("font-family", "Optima")
-        .attr("font-size", 18);
+        .attr("transform", "scale(0.1)") //shrink the intervals away.
 }
 
 draw_intervals(intervals)
