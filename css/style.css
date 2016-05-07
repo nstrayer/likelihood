@@ -58,3 +58,13 @@ strong.choosen{
   stroke: steelblue;
   stroke-width: 1.5px;
 }
+
+.h1text {
+    color: blue;
+    font-weight: bold;
+}
+
+.h2text {
+    color: green;
+    font-weight: bold;
+}

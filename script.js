@@ -134,7 +134,7 @@ var intervals = generateIntervals(currentIntervals, curveData)
 
 //Function to add, remove, or move intervals.
 function draw_intervals(intervals_data){
-    var speed = 800;
+    var speed = 500;
 
     var support_ints = svg.selectAll(".supportIntervals")
         .data(intervals_data, function(d){return d.lik})
@@ -258,6 +258,7 @@ function updateCurve(n,k){
         .attr("d", line);
 
     newIntervals()
+    likelihoodRatio()
 }
 
 //Allow the user to input a custom n and x value and then update the trials bar.
@@ -280,34 +281,81 @@ function newIntervals(){
     //grab user input from the custom interval box
     var customVal = 1/eval(document.getElementById("customInt").value)
     //check if they put anything in and if they did push it to inverval array.
-    if(customVal != null){ selected.push(customVal)}
+
+    if(customVal != null && !isNaN(customVal)){ selected.push(customVal)}
 
     draw_intervals(generateIntervals(selected, curveData))
 }
 
 //function to read in the hypothesis values for the LR and plot them + return results
 function likelihoodRatio(){
-    var h1 = eval(document.getElementById("h1").value); //eval supports fractions too.
-    var h2 = eval(document.getElementById("h2").value);
+
+    try {
+        var h1 = eval(document.getElementById("h1").value); //eval supports fractions too.
+        var h2 = eval(document.getElementById("h2").value);
+    } catch (e) {
+        var h1 = 2
+        var h2 = 4
+    }
+
     var n  = eval(document.getElementById("customN").value); //grab the data vals too.
     var k  = eval(document.getElementById("customX").value);
     var mle = binLik(k/n, n , k)
+    console.log(h2)
 
-    if(h1 < 0 || h1 > 1 || h2 < 0 || h2 > 1 ){
+    if(h1 < 0 || h1 > 1 || h2 < 0 || h2 > 1 || isNaN(h1) || isNaN(h2)){
         alert("Make sure your hypothesis are in the range of possible p")
         //reset the values.
     } else{ //if the input is valid then let's generate some likelihood ratios.
         //generate data for plotting
-        hyp_points = [{"hypothesis": 1, "p": h1, "lik": binLik(h1, n, k)/mle},
-                      {"hypothesis": 2, "p": h2, "lik": binLik(h2, n, k)/mle}]
+        var lik_h1 = binLik(h1, n, k)/mle,
+            lik_h2 = binLik(h2, n, k)/mle;
+
+        hyp_points = [{"hypothesis": 1, "p": h1, "lik": lik_h1},
+                      {"hypothesis": 2, "p": h2, "lik": lik_h2}]
 
         //draw circles over the likelihood curve at the hypothesis values
         var hypotheses = svg.selectAll(".hypotheses")
             .data(hyp_points, function(d){return d.hypothesis})
 
+        hypotheses
+            .transition().duration(500)
+            .attr("transform", function(d){ //move the g up to the right position
+                return "translate(" + x_scale(d.p) + "," + y_scale(d.lik) +")";
+            })
+            .each(function(d){
+                //Draw light lines to the y axis to show where the values fall
+                d3.select(this) //line to y axis
+                    .select("line")
+                    .attr("class", "axisLine")
+                    .attr("x1", -6 )
+                    .attr("x2", -6 )
+                    .transition().delay(500).duration(500)
+                    .attr("x2", -x_scale(d.p) + padding )
+                    .attr("stroke", "grey")
+                    .attr("opacity", 0.3)
+                    .attr("stroke-width", 1)
+             })
+
+        hypotheses.exit()
+            .each(function(d){
+                d3.select(this)
+                    .select("circle")
+                    .transition().duration(500)
+                    .attr("r", 0)
+
+                d3.select(this) //line to y axis
+                    .select("line")
+                    .transition().duration(500)
+                    .attr("x1", -6 )
+                    .attr("x2", -6 )
+             })
+             .remove()
+
+
         hypotheses.enter()
             .append("g")
-            .attr("class", "supportIntervals")
+            .attr("class", "hypotheses")
             .attr("transform", function(d){ //move the g up to the right position
                 return "translate(" + x_scale(d.p) + "," + y_scale(d.lik) +")";
             })
@@ -318,23 +366,39 @@ function likelihoodRatio(){
                     .attr("fill", "white")
                     .attr("stroke", d.hypothesis == 1 ? "blue":"green")
                     .attr("stroke-width", 2)
-                    .transition().duration(800)
+                    .transition().duration(500)
                     .attr("r", 8)
 
+                //Draw light lines to the y axis to show where the values fall
                 d3.select(this) //line to y axis
-                    .append("line") //fix this. Lines go too far. 
+                    .append("line")
                     .attr("class", "axisLine")
-                    .attr("x1", 0 )
-                    .attr("x2", 0 )
-                    .transition().delay(800).duration(800)
-                    .attr("x2", - x_scale(d.p) )
+                    .attr("x1", -6 )
+                    .attr("x2", -6 )
+                    .transition().delay(500).duration(500)
+                    .attr("x2", -x_scale(d.p) + padding )
                     .attr("stroke", "grey")
                     .attr("opacity", 0.3)
                     .attr("stroke-width", 1)
              })
 
-        //Draw light lines to the y axis to show where the values fall
-
         //calculate the likelihood ratio and display somewhere.
+        var LR = Math.round((lik_h1/lik_h2) * 1000) /1000
+        d3.select("#ratioReport")
+            .style("font-weight", "bold")
+            .text(LR)
     }
+}
+
+function clear_LR(){
+    //empty the text boxes and then call the ratio function which will remove points.
+    document.getElementById("h1").value = "";
+    document.getElementById("h2").value = "";
+    d3.select("#ratioReport").text("")
+    d3.selectAll(".hypotheses").remove()
+}
+
+function clear_custom_int(){
+    document.getElementById("customInt").value = "";
+    newIntervals()
 }
