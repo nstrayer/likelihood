@@ -132,7 +132,6 @@ function generateIntervals(currentIntervals, curveData){
 //generate initial intervals for plotting
 var intervals = generateIntervals(currentIntervals, curveData)
 
-
 //Function to add, remove, or move intervals.
 function draw_intervals(intervals_data){
     var speed = 800;
@@ -279,9 +278,63 @@ function newIntervals(){
         selected.push(eval($(this).val()));
     });
     //grab user input from the custom interval box
-    var customVal = eval(document.getElementById("customInt").value)
+    var customVal = 1/eval(document.getElementById("customInt").value)
     //check if they put anything in and if they did push it to inverval array.
     if(customVal != null){ selected.push(customVal)}
 
     draw_intervals(generateIntervals(selected, curveData))
+}
+
+//function to read in the hypothesis values for the LR and plot them + return results
+function likelihoodRatio(){
+    var h1 = eval(document.getElementById("h1").value); //eval supports fractions too.
+    var h2 = eval(document.getElementById("h2").value);
+    var n  = eval(document.getElementById("customN").value); //grab the data vals too.
+    var k  = eval(document.getElementById("customX").value);
+    var mle = binLik(k/n, n , k)
+
+    if(h1 < 0 || h1 > 1 || h2 < 0 || h2 > 1 ){
+        alert("Make sure your hypothesis are in the range of possible p")
+        //reset the values.
+    } else{ //if the input is valid then let's generate some likelihood ratios.
+        //generate data for plotting
+        hyp_points = [{"hypothesis": 1, "p": h1, "lik": binLik(h1, n, k)/mle},
+                      {"hypothesis": 2, "p": h2, "lik": binLik(h2, n, k)/mle}]
+
+        //draw circles over the likelihood curve at the hypothesis values
+        var hypotheses = svg.selectAll(".hypotheses")
+            .data(hyp_points, function(d){return d.hypothesis})
+
+        hypotheses.enter()
+            .append("g")
+            .attr("class", "supportIntervals")
+            .attr("transform", function(d){ //move the g up to the right position
+                return "translate(" + x_scale(d.p) + "," + y_scale(d.lik) +")";
+            })
+            .each(function(d){
+                d3.select(this)
+                    .append("circle")
+                    .attr("r", 0)
+                    .attr("fill", "white")
+                    .attr("stroke", d.hypothesis == 1 ? "blue":"green")
+                    .attr("stroke-width", 2)
+                    .transition().duration(800)
+                    .attr("r", 8)
+
+                d3.select(this) //line to y axis
+                    .append("line") //fix this. Lines go too far. 
+                    .attr("class", "axisLine")
+                    .attr("x1", 0 )
+                    .attr("x2", 0 )
+                    .transition().delay(800).duration(800)
+                    .attr("x2", - x_scale(d.p) )
+                    .attr("stroke", "grey")
+                    .attr("opacity", 0.3)
+                    .attr("stroke-width", 1)
+             })
+
+        //Draw light lines to the y axis to show where the values fall
+
+        //calculate the likelihood ratio and display somewhere.
+    }
 }

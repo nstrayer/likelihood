@@ -36,9 +36,9 @@
         <p>An 1/a interval is an interval that all contains all values of the given parameter that have at least
             a 1/a chance of being the true given the observed data. </p>
         <form action="demo_form.asp" method="get">
-          <input type="checkbox" name="intervals" id = "1_8_int"  value="1/8"  checked="checked"> 1/8 <br>
-          <input type="checkbox" name="intervals" id = "1_16_int" value="1/16" checked="checked"> 1/16<br>
-          <input type="text"     name="intervals" id = "customInt" value="1/6.8" size="8">
+          <input type="checkbox" name="intervals" id = "1_8_int"  value="1/8" onclick="newIntervals()" checked="checked"> 1/8
+          <input type="checkbox" name="intervals" id = "1_16_int" value="1/16" onclick="newIntervals()" checked="checked"> 1/16<br>
+          <p> Custom interval 1/ <input type="text" name="intervals" id = "customInt" value="6.8" size="2"> </p>
           <input type="button" onclick="newIntervals()" value="Submit">
         </form>
 
@@ -47,8 +47,13 @@
         <h3>Likelihood Ratio</h3>
         <p> A likelihood ratio is the likelihood that your hypothesis 1 is true
             over your hypothesis 2 according to the observed data.</p>
-        <div id = "probOfSuccess" class = "valueSlider col-md-12"></div>
-        <p></p>
+        <form>
+          <span class = "hypothesis"> H<sub>1</sub> </span>
+          <input type="text" name="h1" value="0.5" id = "h1" size="4">
+          <span class = "hypothesis"> H<sub>2</sub> </span>
+          <input type="text" name="successes" value="0.3" id = "h2" size="4">
+        <input type="button" onclick="likelihoodRatio()" value="Submit">
+        </form>
     </div>
 
     </div>
