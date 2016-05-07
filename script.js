@@ -7,7 +7,8 @@ d3.selection.prototype.moveToFront = function() {
 
 var width = parseInt(d3.select("#viz").style("width").slice(0, -2)),
     height = $(window).height() - 85,
-    padding = 35;
+    padding = 35,
+    speed = 500;;
 
 var svg = d3.select("#viz").append("svg")
     .attr("height", height)
@@ -102,7 +103,7 @@ svg.append("path")
       .datum(curveData)
       .attr("class", "line likelihoodCurve")
       .attr("d", lineStart)
-      .transition().duration(700)
+      .transition().duration(speed)
       .attr("d", line);
 
 
@@ -134,7 +135,7 @@ var intervals = generateIntervals(currentIntervals, curveData)
 
 //Function to add, remove, or move intervals.
 function draw_intervals(intervals_data){
-    var speed = 500;
+    var colors = ['#66c2a5','#fc8d62','#8da0cb','#e78ac3']
 
     var support_ints = svg.selectAll(".supportIntervals")
         .data(intervals_data, function(d){return d.lik})
@@ -178,7 +179,7 @@ function draw_intervals(intervals_data){
         .attr("transform", function(d){ //move the g up to the right position
             return "translate( 0 ," + y_scale(d.lik) +")";
         })
-        .each(function(d){
+        .each(function(d,i){
             d3.select(this) //start with the lines.
                 .append("line")
                 .attr("class", "intervalLine")
@@ -189,8 +190,8 @@ function draw_intervals(intervals_data){
                 .transition().duration(speed)
                 .attr("x1", x_scale(d.left) )
                 .attr("x2", x_scale(d.right))
-                .attr("stroke", "red")
-                .attr("stroke-width", 1)
+                .attr("stroke", colors[i])
+                .attr("stroke-width", 1.5)
 
             d3.select(this) //Left dropdown line
                 .append("line")
@@ -202,7 +203,7 @@ function draw_intervals(intervals_data){
                 .transition().delay(speed).duration(speed)
                 .attr("y1", 0 )
                 .attr("y2", height - padding - y_scale(d.lik) )
-                .attr("stroke", "grey")
+                .attr("stroke", colors[i])
                 .attr("opacity", 0.3)
                 .attr("stroke-width", 1)
 
@@ -248,19 +249,6 @@ function draw_intervals(intervals_data){
 
 draw_intervals(intervals)
 
-//function to update the whole plot with new data
-// Function to update the likelihood curve with new data.
-function updateCurve(n,k){
-    curveData = likCurve(0, 1, n, k)
-    svg.select(".likelihoodCurve")
-        .datum(curveData)
-        .transition().duration(700)
-        .attr("d", line);
-
-    newIntervals()
-    likelihoodRatio()
-}
-
 //Allow the user to input a custom n and x value and then update the trials bar.
 function customNK(){
     //grab values from the user form
@@ -271,6 +259,19 @@ function customNK(){
     if(k > n){document.getElementById("customX").value = n}
 
     updateCurve(n,k) //update the likelihood and the intervals.
+}
+
+//function to update the whole plot with new data
+// Function to update the likelihood curve with new data.
+function updateCurve(n,k){
+    curveData = likCurve(0, 1, n, k)
+    svg.select(".likelihoodCurve")
+        .datum(curveData)
+        .transition().duration(speed)
+        .attr("d", line);
+
+    newIntervals()
+    likelihoodRatio(curve)
 }
 
 function newIntervals(){
@@ -288,7 +289,7 @@ function newIntervals(){
 }
 
 //function to read in the hypothesis values for the LR and plot them + return results
-function likelihoodRatio(){
+function likelihoodRatio(where){
 
     try {
         var h1 = eval(document.getElementById("h1").value); //eval supports fractions too.
@@ -304,7 +305,7 @@ function likelihoodRatio(){
     console.log(h2)
 
     if(h1 < 0 || h1 > 1 || h2 < 0 || h2 > 1 || isNaN(h1) || isNaN(h2)){
-        alert("Make sure your hypothesis are in the range of possible p")
+        if(where != "curve"){alert("Make sure your hypothesis are in the range of possible p")}
         //reset the values.
     } else{ //if the input is valid then let's generate some likelihood ratios.
         //generate data for plotting
@@ -319,7 +320,7 @@ function likelihoodRatio(){
             .data(hyp_points, function(d){return d.hypothesis})
 
         hypotheses
-            .transition().duration(500)
+            .transition().duration(speed)
             .attr("transform", function(d){ //move the g up to the right position
                 return "translate(" + x_scale(d.p) + "," + y_scale(d.lik) +")";
             })
@@ -330,7 +331,7 @@ function likelihoodRatio(){
                     .attr("class", "axisLine")
                     .attr("x1", -6 )
                     .attr("x2", -6 )
-                    .transition().delay(500).duration(500)
+                    .transition().delay(speed).duration(speed)
                     .attr("x2", -x_scale(d.p) + padding )
                     .attr("stroke", "grey")
                     .attr("opacity", 0.3)
@@ -341,12 +342,12 @@ function likelihoodRatio(){
             .each(function(d){
                 d3.select(this)
                     .select("circle")
-                    .transition().duration(500)
+                    .transition().duration(speed)
                     .attr("r", 0)
 
                 d3.select(this) //line to y axis
                     .select("line")
-                    .transition().duration(500)
+                    .transition().duration(speed)
                     .attr("x1", -6 )
                     .attr("x2", -6 )
              })
@@ -366,7 +367,7 @@ function likelihoodRatio(){
                     .attr("fill", "white")
                     .attr("stroke", d.hypothesis == 1 ? "blue":"green")
                     .attr("stroke-width", 2)
-                    .transition().duration(500)
+                    .transition().duration(speed)
                     .attr("r", 8)
 
                 //Draw light lines to the y axis to show where the values fall
@@ -375,7 +376,7 @@ function likelihoodRatio(){
                     .attr("class", "axisLine")
                     .attr("x1", -6 )
                     .attr("x2", -6 )
-                    .transition().delay(500).duration(500)
+                    .transition().delay(speed).duration(speed)
                     .attr("x2", -x_scale(d.p) + padding )
                     .attr("stroke", "grey")
                     .attr("opacity", 0.3)
