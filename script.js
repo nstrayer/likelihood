@@ -200,11 +200,11 @@ function draw_intervals(intervals_data){
                 .attr("x2", x_scale(d.left) )
                 .attr("y1", 0 )
                 .attr("y2", 0 )
-                .transition().delay(speed).duration(speed)
+                .transition().delay(speed).duration(speed/2)
                 .attr("y1", 0 )
                 .attr("y2", height - padding - y_scale(d.lik) )
                 .attr("stroke", colors[i])
-                .attr("opacity", 0.3)
+                .attr("opacity", 0.5)
                 .attr("stroke-width", 1)
 
             d3.select(this) //Left dropdown line
@@ -214,11 +214,11 @@ function draw_intervals(intervals_data){
                 .attr("x2", x_scale(d.right) )
                 .attr("y1", 0 )
                 .attr("y2", 0 )
-                .transition().delay(speed).duration(speed)
+                .transition().delay(speed).duration(speed/2)
                 .attr("y1", 0 )
                 .attr("y2", height - padding - y_scale(d.lik) )
                 .attr("stroke", "grey")
-                .attr("opacity", 0.3)
+                .attr("opacity", 0.5)
                 .attr("stroke-width", 1)
 
             d3.select(this) //Now the text
