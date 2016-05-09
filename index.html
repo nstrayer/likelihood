@@ -16,14 +16,17 @@
 <script src = "js/nouislider.min.js"></script>
 <body>
     <div id = "header"><h1></h1></div>
-    <div id = "menu" class = "col-md-3 col-md-offset-1 col-sm-12">
+    <div id = "menu" class = "col-md-4 col-md-offset-1 col-sm-12">
 
     <div class = "menuSection">
-        <h1>Likelihood</h1>
-        <p>By reversing the order of conditionality of a probability density function:</p>
+        <h1>The Likelihood Function</h1>
+        <!-- <p>By reversing the order of conditionality of a probability density function:</p>
 
             <p id = "formula"> &#131;(data|param) &rarr; L(param|data) </p>
-        <p>
+        <p> -->
+            <p>By reversing the order of conditionality of a probability density function:
+                <span id = "formula"> &#131;(data|param) &rarr; L(param|data)</span>
+
             we end up with something called the
             "<a href = "https://en.wikipedia.org/wiki/Likelihood_function">likelihood function</a>".
             Here we are looking at the
@@ -33,7 +36,6 @@
         <hr>
 
         <h3>The Data</h3>
-
         <form>
           <span class = "results">Num. of trials</span>
           <input type="text" name="trials" value="10" id = "customN" size="2">
@@ -45,8 +47,11 @@
         <hr>
 
         <h3>Support Intervals</h3>
-        <p>An 1/a interval contains all values of the parameter that have at least
-            a 1/a likelihood of being the truth given the observed data. </p>
+        <p>These intervals contains all values of the parameter that have at least
+            a 1/a likelihood of being the truth given the observed data. These are
+            similar in concept to confidence intervals but have a slightly different intepretation (see 
+            <a href = "http://nickstrayer.me/binomialFun/confidenceIntervals">here</a> for more info). Try 1/6.8
+            for a support interval roughly equivalent to a 95% confidence interval.</p>
         <form action="demo_form.asp" method="get">
             <div id = "formdiv" class="text-justify">
               <input type="checkbox" name="intervals" class = "intcheck" value="1/8"  onclick="newIntervals()" checked="checked"> 1/8,
@@ -86,7 +91,7 @@
 
     </div>
 
-    <div id = "viz" class = "col-md-7 col-sm-12"></div>
+    <div id = "viz" class = "col-md-6 col-sm-12"></div>
 </body>
 
 <script src = "script.js"></script>

@@ -2,20 +2,6 @@
 body {
   font-family: optima;
 }
-.state rect {
-  /*fill: #dedede;*/
-}
-.state text {
-  font: 12px sans-serif;
-  text-anchor: middle;
-  pointer-events: none;
-}
-.state--selected rect {
-  /*fill: #9f4a6c;*/
-}
-.state--selected text {
-  fill: white;
-}
 
 .axis path,
 .axis line {
@@ -102,6 +88,5 @@ input[type="text"].focus {
 }
 
 #formula {
-    text-align: center;
-    margin: 5px;
+    font-weight: bold;
 }
