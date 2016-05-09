@@ -36,12 +36,22 @@
         <p>An 1/a interval is an interval that all contains all values of the given parameter that have at least
             a 1/a chance of being the true given the observed data. </p>
         <form action="demo_form.asp" method="get">
-          <input type="checkbox" name="intervals" id = "1_8_int"  value="1/8" onclick="newIntervals()" checked="checked"> 1/8
-          <input type="checkbox" name="intervals" id = "1_16_int" value="1/16" onclick="newIntervals()" checked="checked"> 1/16
+          <span id = "1/8">
+              <input type="checkbox" name="intervals" id = "1_8_int"  value="1/8" onclick="newIntervals()" checked="checked"> 1/8
+          </span>
+          <span id = "1/16">
+              <input type="checkbox" name="intervals" id = "1_16_int" value="1/16" onclick="newIntervals()" checked="checked"> 1/16
+          </span>
+          <span id = "1/32">
           <input type="checkbox" name="intervals" id = "1_32_int" value="1/32" onclick="newIntervals()" > 1/32<br>
-          <p> Custom interval 1/ <input type="text" name="intervals" id = "customInt" value="" size="2">
-          <input type="button" onclick="newIntervals()" value="Submit">
-          <input type="button" onclick="clear_custom_int()" value="Clear"></p>
+          </span>
+          <p>
+              <span id = "custom">
+                  Custom interval 1/ <input type="text" name="intervals" id = "customInt" value="" size="2">
+              </span>
+              <input type="button" onclick="newIntervals()" value="Submit">
+              <input type="button" onclick="clear_custom_int()" value="Clear">
+          </p>
         </form>
 
         <hr>

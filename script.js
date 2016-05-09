@@ -8,13 +8,18 @@ d3.selection.prototype.moveToFront = function() {
 var width = parseInt(d3.select("#viz").style("width").slice(0, -2)),
     height = $(window).height() - 85,
     padding = 35,
-    speed = 500;;
+    speed = 500,
+    colors = ['#66c2a5','#fc8d62','#8da0cb','#e78ac3'];
 
 var svg = d3.select("#viz").append("svg")
     .attr("height", height)
     .attr("width", width)
 
-var currentIntervals = [1/8, 1/16]
+// var currentIntervals = [{"value":1/8, "name": "1/8"},
+//                         {"value":1/16, "name": "1/16"}
+
+var currentIntervals = ["1/8", "1/16"]
+
 //Binomial likelihood function.
 function binLik(p, n , k){ return Math.pow(p,k) * Math.pow((1-p), (n - k)) }
 
@@ -108,7 +113,10 @@ svg.append("path")
 
 
 //calculate the likelihood interval.
-function lik_int(val, lik_vec){
+//Takes as input the string of the fraction for interval and the vector of likelihoods
+function lik_int(name, lik_vec){
+    var val = eval(name); //turn the fraction string into a value.
+
     //traverse up the likelihoods to find left instance of value
     var left_pos = 0
     while (lik_vec[left_pos].likelihood < val) {left_pos++;}
@@ -120,13 +128,13 @@ function lik_int(val, lik_vec){
     var left  = Math.max(lik_vec[left_pos].p, 0) //dont let the intervals go out of bounds.
     var right = Math.min(lik_vec[right_pos].p, 1)
 
-    return {"lik": val, "left":left, "right":right}
+    return {"name": name, "lik": val, "left":left, "right":right}
 }
 
 //Add likelihood intervals to vector.
 function generateIntervals(currentIntervals, curveData){
     var ints = []
-    currentIntervals.forEach(function(int){ ints.push(lik_int(int,  curveData) )})
+    currentIntervals.forEach(function(name){ ints.push(lik_int(name,  curveData) )})
     return ints
 }
 
@@ -135,7 +143,6 @@ var intervals = generateIntervals(currentIntervals, curveData)
 
 //Function to add, remove, or move intervals.
 function draw_intervals(intervals_data){
-    var colors = ['#66c2a5','#fc8d62','#8da0cb','#e78ac3']
 
     var support_ints = svg.selectAll(".supportIntervals")
         .data(intervals_data, function(d){return d.lik})
@@ -207,7 +214,7 @@ function draw_intervals(intervals_data){
                 .attr("opacity", 0.5)
                 .attr("stroke-width", 1)
 
-            d3.select(this) //Left dropdown line
+            d3.select(this) //right dropdown line
                 .append("line")
                 .attr("class", "rightDropLine")
                 .attr("x1", x_scale(d.right) )
@@ -217,7 +224,7 @@ function draw_intervals(intervals_data){
                 .transition().delay(speed).duration(speed/2)
                 .attr("y1", 0 )
                 .attr("y2", height - padding - y_scale(d.lik) )
-                .attr("stroke", "grey")
+                .attr("stroke", colors[i])
                 .attr("opacity", 0.5)
                 .attr("stroke-width", 1)
 
@@ -244,10 +251,26 @@ function draw_intervals(intervals_data){
                 .attr("y", -2 )
                 .transition().duration(speed)
                 .attr("x", x_scale(d.right) + 2)
+
+            d3.select(this) //draw the value of the interval above it.
+                .append("text")
+                .attr("class", "intervalName")
+                .text( d.name )
+                .attr("text-anchor", "start")
+                .attr("font-size", 0)
+                .attr("font-family", "Optima")
+                .attr("font-weight", "bold")
+                .style("fill", colors[i])
+                .attr("x",  x_scale((d.right + d.left)/2) )
+                .attr("y", -2 )
+                .transition().duration(speed)
+                .attr("font-size", 14)
         })
+
 }
 
 draw_intervals(intervals)
+// `intervalLegend(intervalNames)
 
 //Allow the user to input a custom n and x value and then update the trials bar.
 function customNK(){
@@ -277,15 +300,19 @@ function updateCurve(n,k){
 function newIntervals(){
     var selected = []
     $("input:checkbox[name=intervals]:checked").each(function(){
-        selected.push(eval($(this).val()));
+        var value = $(this).val()
+        selected.push(value);
     });
+
     //grab user input from the custom interval box
     var customVal = 1/eval(document.getElementById("customInt").value)
     //check if they put anything in and if they did push it to inverval array.
 
-    if(customVal != null && !isNaN(customVal)){ selected.push(customVal)}
-
+    if(customVal != null && !isNaN(customVal)){
+        selected.push("1/" + document.getElementById("customInt").value);
+    }
     draw_intervals(generateIntervals(selected, curveData))
+    // intervalLegend(selectedNames)
 }
 
 //function to read in the hypothesis values for the LR and plot them + return results
