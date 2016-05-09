@@ -1,4 +1,4 @@
-</html>
+``</html>
 
 <!DOCTYPE html>
 <meta charset="utf-8">
@@ -17,48 +17,50 @@
     <div id = "menu" class = "col-md-3 col-md-offset-1 col-sm-12">
 
     <div class = "menuSection">
-        <h1>The Likelihood Function</h1>
-
+        <h1>Likelihood</h1>
+        <p>By reversing the order of conditionality of a probability density function
+            we end up with something called the
+            "<a href = "https://en.wikipedia.org/wiki/Likelihood_function">likelihood function</a>".
+            Here we are looking at the
+            <a href = "http://nickstrayer.me/binomialFun/">binomial distribution</a>.
+            The x-axis represents the parameter you're looking at (in this case, p: probability of success) and the y-axis
+            is proportional to the likelihood of that parameter value being the truth, given the observed data.
         <hr>
 
-        <h3>Your Data</h3>
-        <p> Enter your number of trials (n) and number of successes (k). </p>
+        <h3>The Data</h3>
+
         <form>
-          <span class = "results"> n:</span>
-          <input type="text" name="trials" value="10" id = "customN" size="8">
-          <span class = "results"> k:</span>
-          <input type="text" name="successes" value="8" id = "customX" size="8">
-        <input type="button" onclick="customNK()" value="Submit">
+          <span class = "results">Num. of trials</span>
+          <input type="text" name="trials" value="10" id = "customN" size="2">
+          <span class = "results">, num. of successes </span>
+          <input type="text" name="successes" value="8" id = "customX" size="2">
+
+        <input type="button" onclick="customNK()" value="Enter">
         </form>
         <hr>
 
         <h3>Support Intervals</h3>
-        <p>An 1/a interval is an interval that all contains all values of the given parameter that have at least
-            a 1/a chance of being the true given the observed data. </p>
+        <p>An 1/a interval contains all values of the parameter that have at least
+            a 1/a likelihood of being the truth given the observed data. </p>
         <form action="demo_form.asp" method="get">
-          <span id = "1/8">
-              <input type="checkbox" name="intervals" id = "1_8_int"  value="1/8" onclick="newIntervals()" checked="checked"> 1/8
-          </span>
-          <span id = "1/16">
-              <input type="checkbox" name="intervals" id = "1_16_int" value="1/16" onclick="newIntervals()" checked="checked"> 1/16
-          </span>
-          <span id = "1/32">
-          <input type="checkbox" name="intervals" id = "1_32_int" value="1/32" onclick="newIntervals()" > 1/32<br>
-          </span>
-          <p>
+            <div id = "formdiv" class="text-justify">
+              <input type="checkbox" name="intervals" class = "intcheck" value="1/8"  onclick="newIntervals()" checked="checked"> 1/8,
+              <input type="checkbox" name="intervals" class = "intcheck" value="1/16" onclick="newIntervals()" checked="checked"> 1/16,
+              <input type="checkbox" name="intervals" class = "intcheck" value="1/32" onclick="newIntervals()" > 1/32,
+
               <span id = "custom">
-                  Custom interval 1/ <input type="text" name="intervals" id = "customInt" value="" size="2">
+                  1/ <input type="text" name="intervals" id = "customInt" value="" size="2">
               </span>
               <input type="button" onclick="newIntervals()" value="Submit">
               <input type="button" onclick="clear_custom_int()" value="Clear">
-          </p>
+            </div>
         </form>
 
         <hr>
 
         <h3>Likelihood Ratio</h3>
-        <p> A likelihood ratio is the likelihood that your hypothesis 1 is true
-            over your hypothesis 2 according to the observed data.</p>
+        <p> The likelihood that hypothesis 1 for the parameter is true
+            over hypothesis 2, given the observed data.</p>
         <form>
           <span class = "hypothesis"> <span class = "h1text"> H<sub>1</sub> </span>  </span>
           <input type="text" name="h1" value="" id = "h1" size="4">

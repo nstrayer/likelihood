@@ -173,11 +173,15 @@ function draw_intervals(intervals_data){
                 .transition().duration(speed)
                 .text( Math.round(d.right*1000)/1000 )
                 .attr("x", x_scale(d.right) + 2)
+
+            d3.select(this).select(".intervalName") //draw the value of the interval above it.
+                .transition().duration(speed)
+                .attr("x",  x_scale((d.right + d.left)/2) )
         })
 
     support_ints.exit()
         .transition().duration(speed)
-        .attr("transform", "scale(0.1)") //shrink the intervals away.
+        .attr("transform", "scale(0.1, 0.1)") //shrink the intervals away.
         .remove()
 
     support_ints.enter()

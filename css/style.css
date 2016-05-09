@@ -69,6 +69,34 @@ strong.choosen{
     font-weight: bold;
 }
 
-#18interval {
-    background-color: yellow !important;
+#formDiv {
+    text-align: center;
+}
+
+.form input {
+    display: block;
+    margin-bottom: 1em;
+}
+
+.form label {
+    float: left;
+    margin-right: 1em;
+}
+
+input[type="text"] {
+    border:0;
+    border-bottom:solid 1px grey;
+    text-align: center;
+    /*outline:none; /* prevents textbox highlight in chrome */*/
+}
+
+input[type="button"] {
+    background: #e4e4e4;
+    border: 1px solid #e4e4e4;
+    /*text-shadow: 1px 1px 1px #000;*/
+}
+
+input:focus,
+input[type="text"].focus {
+    outline:1 steelblue;
 }
